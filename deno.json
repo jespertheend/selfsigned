@@ -1,0 +1,7 @@
+{
+	"fmt": {
+		"lineWidth": 300,
+		"useTabs": true,
+		"proseWrap": "preserve"
+	}
+}
