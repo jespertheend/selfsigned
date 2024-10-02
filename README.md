@@ -13,7 +13,7 @@ For example, say you have the following `dev.js` file:
 
 import { serveDir } from "jsr:@std/http/file-server";
 import { setCwd } from "https://deno.land/x/chdir_anywhere@v0.0.3/mod.js";
-import { getSelfSignedCert } from "jsr:@jespertheend/selfsigned/mod.ts";
+import { getSelfSignedCert } from "jsr:@jespertheend/selfsigned";
 
 setCwd();
 
