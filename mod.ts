@@ -1,8 +1,8 @@
 #!/usr/bin/env -S deno run --allow-run=openssl --allow-read --allow-write
 
-import * as fs from "jsr:@std/fs";
-import * as stdPath from "jsr:@std/path";
-import { parseArgs } from "jsr:@std/cli";
+import * as fs from "jsr:@std/fs@1.0.4";
+import * as stdPath from "jsr:@std/path@1.0.6";
+import { parseArgs } from "jsr:@std/cli@1.0.6";
 
 export type GetSelfSignedCertOptions = {
 	/**
@@ -36,7 +36,15 @@ export type GetSelfSignedCertDocumentationOptions = {
 	projectUrl?: string;
 };
 
-export async function getSelfSignedCert(options: GetSelfSignedCertOptions) {
+export type SelfSignedCerResult = {
+	key: string;
+	cert: string;
+	keyFile: string;
+	certFile: string;
+	outDir: string;
+}
+
+export async function getSelfSignedCert(options: GetSelfSignedCertOptions): Promise<SelfSignedCerResult | null> {
 	const outDir = stdPath.resolve(options.outDir || "selfSignedCerts");
 	try {
 		return await generateOutDirContents(outDir, options);

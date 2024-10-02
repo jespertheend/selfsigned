@@ -2,6 +2,7 @@
 	"name": "@jespertheend/selfsigned",
 	"version": "0.1.0",
 	"exports": "./mod.ts",
+	"license": "MIT",
 	"fmt": {
 		"lineWidth": 300,
 		"useTabs": true,
