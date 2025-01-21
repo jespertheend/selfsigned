@@ -4,6 +4,9 @@ import * as fs from "jsr:@std/fs@1.0.4";
 import * as stdPath from "jsr:@std/path@1.0.6";
 import { parseArgs } from "jsr:@std/cli@1.0.6";
 
+/**
+ * Options used for the `getSelfSignedCert()` call.
+ */
 export type GetSelfSignedCertOptions = {
 	/**
 	 * Name that will be used for the certificate and in documentation.
@@ -32,6 +35,9 @@ export type GetSelfSignedCertOptions = {
 	docs?: GetSelfSignedCertDocumentationOptions;
 };
 
+/**
+ * Extra set of options that are used when generating documentation.
+ */
 export type GetSelfSignedCertDocumentationOptions = {
 	/**
 	 * Where you plan on hosting your https server. For example: 'https://localhost:8080'.
@@ -39,6 +45,9 @@ export type GetSelfSignedCertDocumentationOptions = {
 	projectUrl?: string;
 };
 
+/**
+ * Either the certificates that were generated just now or the certificates that were generated in an earlier call.
+ */
 export type SelfSignedCertResult = {
 	key: string;
 	cert: string;
@@ -47,6 +56,9 @@ export type SelfSignedCertResult = {
 	outDir: string;
 };
 
+/**
+ * Creates a directory with generated self signed certificates and documentation on how to install these certificates.
+ */
 export async function getSelfSignedCert(options: GetSelfSignedCertOptions): Promise<SelfSignedCertResult | null> {
 	const outDir = stdPath.resolve(options.outDir || "selfSignedCerts");
 	try {
