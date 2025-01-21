@@ -23,7 +23,7 @@ export type GetSelfSignedCertOptions = {
 	/**
 	 * An array of extra alt names which should be added to the certificate.
 	 * For example: `["DNS:localhost.example.com", "IP:192.168.0.1"]`.
-	 * By default 'localhost', '127.0.0.1' and '0.0.0.0' are added as alt names.
+	 * By default 'localhost', '127.0.0.1', '0.0.0.0' and '<network name>.local' are added as alt names.
 	 */
 	extraAltNames?: string[];
 	/**
@@ -33,6 +33,9 @@ export type GetSelfSignedCertOptions = {
 };
 
 export type GetSelfSignedCertDocumentationOptions = {
+	/**
+	 * Where you plan on hosting your https server. For example: 'https://localhost:8080'.
+	 */
 	projectUrl?: string;
 };
 
@@ -42,7 +45,7 @@ export type SelfSignedCerResult = {
 	keyFile: string;
 	certFile: string;
 	outDir: string;
-}
+};
 
 export async function getSelfSignedCert(options: GetSelfSignedCertOptions): Promise<SelfSignedCerResult | null> {
 	const outDir = stdPath.resolve(options.outDir || "selfSignedCerts");
@@ -61,7 +64,7 @@ async function generateOutDirContents(outDir: string, {
 	docs = {},
 }: GetSelfSignedCertOptions = {}) {
 	const {
-		projectUrl = "https://localhost:8080",
+		projectUrl = "",
 	} = docs;
 	const keyFile = stdPath.resolve(outDir, "selfsigned.key");
 	const certFile = stdPath.resolve(outDir, "selfsigned.crt");
@@ -70,13 +73,28 @@ async function generateOutDirContents(outDir: string, {
 
 		await Deno.writeTextFile(stdPath.resolve(outDir, ".gitignore"), "**");
 		if (Deno.build.os == "darwin") {
+			const networkNameCommand = new Deno.Command("scutil", {
+				args: ["--get", "LocalHostName"],
+			});
+			const networkNameOutput = await networkNameCommand.output();
+			let networkName: string | null = null;
+			if (!networkNameOutput.success) {
+				console.warn("Failed to get network name of this device. No 'DNS:<network name>.local' alt name will be added to the certificate.");
+			} else {
+				const decoder = new TextDecoder();
+				networkName = decoder.decode(networkNameOutput.stdout).trim().toLowerCase();
+			}
+
 			const altNames = [
 				"DNS:localhost",
 				"IP:127.0.0.1",
 				"IP:0.0.0.0",
 				...extraAltNames,
 			];
-			const command = new Deno.Command("openssl", {
+			if (networkName) {
+				altNames.push(`DNS:${networkName}.local`);
+			}
+			const openSslCommand = new Deno.Command("openssl", {
 				args: [
 					"req",
 					"-newkey",
@@ -99,16 +117,40 @@ async function generateOutDirContents(outDir: string, {
 				stdout: "inherit",
 				stderr: "inherit",
 			});
-			const { success, code } = await command.output();
+			const { success, code } = await openSslCommand.output();
 			if (!success) {
 				throw new Error("openssl exited with status code " + code);
+			}
+
+			let httpsPort = "\\<https port of your application>";
+			if (projectUrl) {
+				let url;
+				try {
+					url = new URL(projectUrl);
+				} catch {
+					// Ignore
+				}
+				if (url) {
+					httpsPort = url.port;
+				}
+			}
+
+			let networkNameIosText;
+			let networkNameIosText2 = "";
+			if (networkName) {
+				const url = `https://${networkName}.local:${httpsPort}`;
+				networkNameIosText = `'DNS:${networkName}.local' has been added to the certificate. You should be able to visit ${url} in Safari after these steps.`;
+				networkNameIosText2 = `\n - Visit ${url} in Safari`;
+			} else {
+				networkNameIosText =
+					"We were not able to determine the network name of this device. You may still try to add the certificate but these steps will likely not work. To work around this, add 'IP:<local device ip>' to `extraAltNames` of the `getSelfSignedCert()` call, delete this directory and retry running the application.";
 			}
 
 			await Deno.writeTextFile(
 				stdPath.resolve(outDir, "readme.md"),
 				`# Self Signed Certs
 
-These files are used for hosting a local https server. You may visit ${projectUrl}
+These files are used for hosting a local https server. You may visit ${projectUrl || "https pages"}
 in your browser directly, but you will probably get a security warning. You can
 dismiss the warning but this will likely still disable some browser features.
 To fix this, you have to make your browser trust the certificate.
@@ -126,8 +168,25 @@ On macOS you can do this by adding selfsigned.crt to your keychain:
 # Firefox
 
 Firefox doesn't automatically trust system certificates unfortunately.
-But so far it seems like dismissing the security warning on ${projectUrl}
+But so far it seems like dismissing the security warning on ${projectUrl || "https pages"}
 adds a security exception which is remembered even after restarting the browser.
+
+# iOS
+
+${networkNameIosText}
+
+- AirDrop the 'selfsigned.crt' file to your iOS device
+- Open the Settings app
+- On the main page in the Settings app, you should see a 'Profile Downloaded' button
+- Tap 'Install' in the top right corner
+- Enter your passcode
+- Tap 'Install' again
+- Tap 'Install' again
+- In the Settings app, go to 'About' -> 'Certificate Trust Settings' (all the way at the bottom of the page)
+- Toggle '${name}' to enable full trust
+- Tap 'Continue'${networkNameIosText2}
+
+To remove the certificate, go to to 'Settings' -> 'General' -> 'VPN & Device Management' -> '${name}' -> 'Remove Profile'.
 `,
 			);
 		} else {
