@@ -39,7 +39,7 @@ export type GetSelfSignedCertDocumentationOptions = {
 	projectUrl?: string;
 };
 
-export type SelfSignedCerResult = {
+export type SelfSignedCertResult = {
 	key: string;
 	cert: string;
 	keyFile: string;
@@ -47,7 +47,7 @@ export type SelfSignedCerResult = {
 	outDir: string;
 };
 
-export async function getSelfSignedCert(options: GetSelfSignedCertOptions): Promise<SelfSignedCerResult | null> {
+export async function getSelfSignedCert(options: GetSelfSignedCertOptions): Promise<SelfSignedCertResult | null> {
 	const outDir = stdPath.resolve(options.outDir || "selfSignedCerts");
 	try {
 		return await generateOutDirContents(outDir, options);
