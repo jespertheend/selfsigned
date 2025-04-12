@@ -152,7 +152,7 @@ async function generateOutDirContents(outDir: string, {
 			if (networkName) {
 				const url = `https://${networkName}.local:${httpsPort}`;
 				networkNameIosText = `'DNS:${networkName}.local' has been added to the certificate. You should be able to visit ${url} in Safari after these steps.`;
-				networkNameIosText2 = `\n - Visit ${url} in Safari`;
+				networkNameIosText2 = `\n- Visit ${url} in Safari`;
 			} else {
 				networkNameIosText =
 					"We were not able to determine the network name of this device. You may still try to add the certificate but these steps will likely not work. To work around this, add 'IP:<local device ip>' to `extraAltNames` of the `getSelfSignedCert()` call, delete this directory and retry running the application.";
@@ -171,9 +171,9 @@ To fix this, you have to make your browser trust the certificate.
 
 On macOS you can do this by adding selfsigned.crt to your keychain:
 	- Double click selfsigned.crt to add it to the macOS keychain
-	- Open Keychain Access and find '${name}' under System Keychains -> System -> Certifcates (tab)
-	- Double click '${name}' and open the 'trust' section
-	- Set 'Secure Sockets Layer (SSL)' to 'always trust'
+	- Open Keychain Access and find '${name}' under **System Keychains** -> **System** -> **Certifcates** (tab)
+	- Double click '${name}' and open the **trust** section
+	- Set **Secure Sockets Layer (SSL)** to **always trust**
 	- Make sure to close the window and enter your password for the changes to take effect
 	- If you have already visited the page, you may need to restart your browser.
 
@@ -189,16 +189,16 @@ ${networkNameIosText}
 
 - AirDrop the 'selfsigned.crt' file to your iOS device
 - Open the Settings app
-- On the main page in the Settings app, you should see a 'Profile Downloaded' button
-- Tap 'Install' in the top right corner
+- On the main page in the Settings app, you should see a **Profile Downloaded** button
+- Tap **Install** in the top right corner
 - Enter your passcode
-- Tap 'Install' again
-- Tap 'Install' again
-- In the Settings app, go to 'About' -> 'Certificate Trust Settings' (all the way at the bottom of the page)
+- Tap **Install** again
+- Tap **Install** again
+- In the Settings app, go to **General** -> **About** -> **Certificate Trust Settings** (all the way at the bottom of the page)
 - Toggle '${name}' to enable full trust
-- Tap 'Continue'${networkNameIosText2}
+- Tap **Continue**${networkNameIosText2}
 
-To remove the certificate, go to to 'Settings' -> 'General' -> 'VPN & Device Management' -> '${name}' -> 'Remove Profile'.
+To remove the certificate, go to to **Settings** -> **General** -> **VPN & Device Management** -> **${name}** -> **Remove Profile**.
 `,
 			);
 		} else {
