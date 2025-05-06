@@ -167,17 +167,34 @@ in your browser directly, but you will probably get a security warning. You can
 dismiss the warning but this will likely still disable some browser features.
 To fix this, you have to make your browser trust the certificate.
 
-# Chrome and Safari
+# Windows 10
 
-On macOS you can do this by adding selfsigned.crt to your keychain:
+Chromium based browsers will look at root certificates of Windows to determine whether a certificate is valid.
+To add selfsigned.crt to your trusted root certificates:
+	- Double click selfsigned.crt
+	- Click **Install Certificate**
+	- Select **Local Machine** and click **Next**
+	- Accept the admin prompt from windows
+	- Select **Place all certificates in the following store** and click **Browse**
+	- Select **Trusted Root Certification Authorities** and click **Ok**
+	- Click **Next**
+	- Click **Finish**
+	- If you have already visited the page, you may need to restart your browser.
+
+Firefox doesn't automatically trust system certificates unfortunately.
+But so far it seems like dismissing the security warning on ${projectUrl || "https pages"}
+adds a security exception which is remembered even after restarting the browser.
+
+# macOS
+
+Chromium based browsers and Safari will look at root certificates of macOS to determine whether a certificate is valid.
+To add selfsigned.crt to your keychain:
 	- Double click selfsigned.crt to add it to the macOS keychain
 	- Open Keychain Access and find '${name}' under **System Keychains** -> **System** -> **Certifcates** (tab)
 	- Double click '${name}' and open the **trust** section
 	- Set **Secure Sockets Layer (SSL)** to **always trust**
 	- Make sure to close the window and enter your password for the changes to take effect
 	- If you have already visited the page, you may need to restart your browser.
-
-# Firefox
 
 Firefox doesn't automatically trust system certificates unfortunately.
 But so far it seems like dismissing the security warning on ${projectUrl || "https pages"}
